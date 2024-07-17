@@ -2,6 +2,9 @@
 #about this project
 For this application, i have choosed MVC architecture.
 
+to get the currency values through API, i have used exchangerate-api account. 
+please visit https://app.exchangerate-api.com/
+
 i have installed 3 packages.
 
 1. http: ^0.13.4 for API calling

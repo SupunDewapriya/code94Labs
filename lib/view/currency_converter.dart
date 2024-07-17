@@ -1,5 +1,10 @@
 import 'package:code94labs/services/auth.dart';
+import 'package:code94labs/services/shared_preference_data.dart';
+import 'package:code94labs/utils/const.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../utils/alerts.dart';
 
 class CurrencyConverter extends StatefulWidget {
   const CurrencyConverter({super.key});
@@ -14,7 +19,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
 
   String _fromCurrency = 'USD';
   String _toCurrency = 'EUR';
-  final _currencies = ['USD', 'EUR'];
+  List<String> _currencies = ['USD', 'EUR'];
 
   String _result = '';
 
@@ -100,12 +105,51 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
     );
   }
 
-  getSavedCurrencies() {
+  getSavedCurrencies() async {
+    final currencyList = await SharedPreferencesData.getCurrencies();
+
+    if(currencyList.isNotEmpty) {
+      _currencies.clear();
+
+      setState(() {
+        _currencies = currencyList;
+      });
+    }
 
   }
 
-  addNewCurrency() {
+  addNewCurrency() async {
+    Alerts.addNewCurrencyAlert(context: context, currentCurrencyList: _currencies, currencyList: Constance.currencies, callback: (value) => onClick(value));
+  }
 
+  onClick(String value) {
+
+    if(_currencies.contains(value)) {
+      showToast("$value removed");
+      setState(() {
+        _currencies.remove(value);
+        SharedPreferencesData.setCurrencies(_currencies);
+      });
+    } else {
+      showToast("$value added");
+      setState(() {
+        _currencies.add(value);
+        SharedPreferencesData.setCurrencies(_currencies);
+      });
+    }
+
+  }
+
+  showToast(message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
   _convertCurrency() async {
